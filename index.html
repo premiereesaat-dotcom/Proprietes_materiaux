@@ -1,0 +1,883 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Propriétés des matériaux</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Mise en page : cahier de laboratoire — une "fiche" par propriété, chacune avec sa couleur, colonne Formules à droite comme sur la fiche élève, puis une manip interactive. */
+:root{
+  --bg:#f2f4f8; --surface:#ffffff; --surface2:#e8ecf3; --ink:#172031; --muted:#556178; --line:#d3d9e4; --accent:#2c56c9;
+  --rho:#2a66d8; --dens:#0d8a7f; --dur:#7346d6; --young:#b97600; --res:#cf3a32; --lam:#d95a12; --sig:#2f8a22; --ac:#b8337f;
+  --water:#6aa6ee; --glow:#ffc928; --good:#1f8a3a; --bad:#cc3333;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "Cascadia Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0f131b; --surface:#171d29; --surface2:#202838; --ink:#e6ebf4; --muted:#9aa5b8; --line:#2d3649; --accent:#86a7ff;
+  --rho:#6d9dff; --dens:#2fc2b3; --dur:#ab8cf6; --young:#f0b43f; --res:#f2756d; --lam:#ff9150; --sig:#70c75d; --ac:#ec78bb;
+  --water:#2c5d9b; --glow:#ffd24a; --good:#5bd07a; --bad:#ff7b7b; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0f131b; --surface:#171d29; --surface2:#202838; --ink:#e6ebf4; --muted:#9aa5b8; --line:#2d3649; --accent:#86a7ff;
+  --rho:#6d9dff; --dens:#2fc2b3; --dur:#ab8cf6; --young:#f0b43f; --res:#f2756d; --lam:#ff9150; --sig:#70c75d; --ac:#ec78bb;
+  --water:#2c5d9b; --glow:#ffd24a; --good:#5bd07a; --bad:#ff7b7b; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.6;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top, 0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1080px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);line-height:1.15;text-wrap:balance;margin:0}
+p{margin:0}
+sup{line-height:0}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.mono{font-family:var(--f-mono)}
+
+/* En-tête */
+.top{padding-block:40px 24px;display:grid;gap:14px}
+.kicker{font-family:var(--f-mono);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.top h1{font-size:clamp(34px,6vw,58px);font-weight:800;letter-spacing:-.02em}
+.top h1 span{background:linear-gradient(90deg,var(--rho),var(--dur),var(--res),var(--lam),var(--sig));-webkit-background-clip:text;background-clip:text;color:transparent}
+.top .intro{max-width:64ch;color:var(--muted);font-size:18px}
+.howto{display:flex;flex-wrap:wrap;gap:10px 20px;font-size:15px;color:var(--muted)}
+.howto b{color:var(--ink)}
+
+/* Navigation */
+nav.chips{position:sticky;top:env(safe-area-inset-top, 0px);z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);margin-inline:calc(-1 * max(16px, env(safe-area-inset-left, 0px)));padding:10px max(16px, env(safe-area-inset-left, 0px))}
+nav.chips .row{max-width:1080px;margin:0 auto;display:flex;gap:8px;overflow-x:auto;scrollbar-width:thin;padding-bottom:2px}
+nav.chips a{flex:none;display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);font-size:14px;
+  padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);white-space:nowrap}
+nav.chips a:hover{border-color:var(--c,var(--accent))}
+nav.chips a i{width:10px;height:10px;border-radius:50%;background:var(--c,var(--accent))}
+nav.chips a b{font-family:var(--f-mono);font-weight:600;color:var(--c,var(--accent))}
+
+/* Sections propriété */
+main{display:grid;gap:56px;padding-block:36px 64px}
+.prop{display:grid;gap:22px;scroll-margin-top:80px}
+.prop-head{display:flex;gap:18px;align-items:center;padding-bottom:14px;border-bottom:3px solid var(--c)}
+.sym{flex:none;width:72px;height:72px;border-radius:18px;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:40px;
+  color:var(--surface);background:var(--c)}
+.sym.small{font-size:20px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--c);font-weight:600}
+.prop-head h2{font-size:clamp(26px,4vw,36px);font-weight:700}
+.prop-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start}
+@media (max-width:820px){.prop-grid{grid-template-columns:minmax(0,1fr)}}
+.explain{display:grid;gap:14px;max-width:66ch}
+.explain ul{margin:0;padding-left:20px;display:grid;gap:4px}
+.hl{background:color-mix(in srgb,var(--c) 18%,transparent);padding:0 4px;border-radius:4px;font-weight:700}
+.example{border-left:4px solid var(--c);background:color-mix(in srgb,var(--c) 8%,var(--surface));padding:12px 16px;border-radius:0 10px 10px 0}
+.example .lbl{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--c);font-weight:600;display:block;margin-bottom:2px}
+.warn{border:1px dashed var(--c);padding:12px 16px;border-radius:10px;font-size:16px}
+.warn b{color:var(--c)}
+
+/* Colonne "Formules" (comme sur la fiche) */
+.fiche{background:var(--surface);border:2px solid var(--c);border-radius:14px;overflow:hidden}
+.fiche h3{font-size:14px;font-family:var(--f-mono);letter-spacing:.1em;text-transform:uppercase;background:var(--c);color:var(--surface);padding:8px 14px;font-weight:600}
+.fiche dl{margin:0;padding:6px 14px 12px;display:grid;grid-template-columns:auto 1fr;gap:8px 12px;align-items:baseline}
+.fiche dt{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.fiche dd{margin:0;font-family:var(--f-mono);font-weight:600}
+.fiche .formula{grid-column:1/-1;font-family:var(--f-mono);font-size:20px;text-align:center;padding:10px;border-radius:10px;background:color-mix(in srgb,var(--c) 10%,var(--surface));color:var(--ink)}
+.fiche .formula small{display:block;font-size:12px;color:var(--muted);font-family:var(--f-body)}
+
+/* Manip interactive */
+.lab{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:16px}
+.lab-title{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:700;font-size:20px}
+.lab-title::before{content:"";width:12px;height:12px;border-radius:3px;background:var(--c);transform:rotate(45deg)}
+.lab-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:center}
+@media (max-width:720px){.lab-grid{grid-template-columns:minmax(0,1fr)}}
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+.presets button,.seg button{border:1px solid var(--line);background:var(--surface2);border-radius:999px;padding:5px 12px;font-size:14px;cursor:pointer}
+.presets button:hover{border-color:var(--c)}
+.presets button[aria-pressed="true"],.seg button[aria-pressed="true"]{background:var(--c);color:var(--surface);border-color:var(--c)}
+.seg{display:inline-flex;gap:4px;padding:4px;border-radius:999px;background:var(--surface2)}
+.seg button{border:none;background:transparent}
+.fields{display:flex;flex-wrap:wrap;gap:12px}
+.field{display:grid;gap:4px;font-size:14px;color:var(--muted)}
+.field input,.field select{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 10px;font-size:17px;color:var(--ink);width:140px}
+.field select{width:auto;max-width:100%}
+.result{display:grid;gap:6px;padding:14px 16px;border-radius:12px;background:color-mix(in srgb,var(--c) 10%,var(--surface))}
+.result .big{font-family:var(--f-mono);font-size:24px;font-weight:600;font-variant-numeric:tabular-nums}
+.result .calc{font-family:var(--f-mono);font-size:15px;color:var(--muted)}
+.verdict{font-weight:700}
+.note{font-size:14px;color:var(--muted)}
+svg{max-width:100%;height:auto;display:block}
+.svg-ink{fill:var(--ink)} .svg-muted{fill:var(--muted)} .svg-line{stroke:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--c)}
+
+/* Mohs */
+.mohs{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px;align-items:end;height:170px}
+.mohs button{border:none;cursor:pointer;border-radius:6px 6px 2px 2px;background:color-mix(in srgb,var(--c) calc(var(--n) * 9% + 10%),var(--surface2));
+  height:calc(var(--n) * 10% );min-height:22px;display:flex;align-items:flex-start;justify-content:center;padding-top:4px;font-family:var(--f-mono);font-weight:600;font-size:13px;color:var(--ink)}
+.mohs button[aria-pressed="true"]{outline:3px solid var(--ink);outline-offset:1px}
+.mohs-names{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px;font-size:11px;color:var(--muted);text-align:center;line-height:1.2}
+.mohs-names span{overflow:hidden;text-overflow:ellipsis}
+@media (max-width:520px){.mohs-names{display:none}}
+
+/* Barres log */
+.bars{display:grid;gap:6px}
+.bar{display:grid;grid-template-columns:120px minmax(0,1fr) 92px;gap:10px;align-items:center;font-size:14px;cursor:pointer;background:none;border:none;text-align:left;padding:2px 0}
+.bar .track{height:16px;border-radius:4px;background:var(--surface2);position:relative;overflow:hidden}
+.bar .fill{position:absolute;inset:0 auto 0 0;border-radius:4px;background:var(--c);transition:width .5s}
+.bar .val{font-family:var(--f-mono);font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.bar[aria-pressed="true"] .name{font-weight:700;color:var(--c)}
+.bar.iso .fill{background:color-mix(in srgb,var(--c) 40%,var(--surface2))}
+@media (max-width:480px){.bar{grid-template-columns:92px minmax(0,1fr) 76px;font-size:13px}}
+.axis{display:grid;grid-template-columns:120px minmax(0,1fr) 92px;gap:10px;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.axis div{display:flex;justify-content:space-between}
+@media (max-width:480px){.axis{grid-template-columns:92px minmax(0,1fr) 76px}}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--sw)}
+
+details{border:1px solid var(--line);border-radius:12px;padding:12px 16px;background:var(--surface)}
+details summary{cursor:pointer;font-weight:700}
+details[open] summary{margin-bottom:8px}
+
+/* Tableau */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:15px}
+th,td{padding:12px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--surface2)}
+tr:last-child td{border-bottom:none}
+td.pname{font-weight:700;border-left:5px solid var(--c)}
+td.s{font-family:var(--f-mono);font-weight:600;color:var(--c);white-space:nowrap}
+td.u{font-family:var(--f-mono);white-space:nowrap}
+tr.info td{color:var(--muted)}
+.reveal{border:1px dashed var(--muted);background:var(--surface2);border-radius:8px;padding:2px 10px;cursor:pointer;font-family:var(--f-mono);color:var(--muted)}
+.tbl-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{border:1px solid var(--accent);background:var(--accent);color:var(--surface);border-radius:10px;padding:8px 14px;cursor:pointer;font-weight:700;font-size:15px}
+.btn.ghost{background:transparent;color:var(--accent)}
+
+/* Pièges */
+.traps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.trap{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:6px;align-content:start}
+.trap h3{font-size:18px}
+.trap .no{color:var(--bad);font-weight:700}
+.trap .yes{color:var(--good);font-weight:700}
+
+/* Quiz */
+.quiz{display:grid;gap:14px}
+.qhead{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;position:sticky;top:calc(env(safe-area-inset-top, 0px) + 58px);z-index:3;background:var(--bg);padding-block:8px}
+.score{font-family:var(--f-mono);font-size:18px;font-weight:600}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:10px}
+.q p.qt{font-weight:700}
+.q p.qt span{font-family:var(--f-mono);color:var(--muted);font-weight:400;margin-right:6px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}
+.opts button{text-align:left;border:1px solid var(--line);background:var(--surface2);border-radius:10px;padding:9px 12px;cursor:pointer}
+.opts button:hover:not(:disabled){border-color:var(--accent)}
+.opts button.ok{background:color-mix(in srgb,var(--good) 18%,var(--surface));border-color:var(--good);font-weight:700}
+.opts button.ko{background:color-mix(in srgb,var(--bad) 15%,var(--surface));border-color:var(--bad)}
+.opts button:disabled{cursor:default}
+.expl{font-size:15px;color:var(--muted)}
+footer{padding-block:24px 48px;color:var(--muted);font-size:14px;border-top:1px solid var(--line)}
+
+.flow{stroke-dasharray:6 8;animation:flow var(--spd,1s) linear infinite}
+@keyframes flow{to{stroke-dashoffset:-28}}
+@keyframes rise{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <p class="kicker">Révision avant le DS · Design &amp; arts appliqués</p>
+    <h1>Propriétés <span>des matériaux</span></h1>
+    <p class="intro">Toutes les notions de la fiche de cours, avec des exemples chiffrés et une manipulation à faire pour chaque propriété. Termine par le tableau de synthèse et le quiz.</p>
+    <div class="howto"><span><b>Bouge</b> les curseurs</span><span><b>Clique</b> sur les matériaux</span><span><b>Vérifie</b> tes réponses dans le quiz</span></div>
+  </header>
+
+  <nav class="chips" aria-label="Sommaire">
+    <div class="row">
+      <a href="#masse-volumique" style="--c:var(--rho)"><b>ρ</b>Masse volumique</a>
+      <a href="#densite" style="--c:var(--dens)"><b>d</b>Densité</a>
+      <a href="#durete" style="--c:var(--dur)"><i></i>Dureté</a>
+      <a href="#rigidite" style="--c:var(--young)"><b>E</b>Rigidité</a>
+      <a href="#resistance" style="--c:var(--res)"><b>RC/RT</b>Résistance</a>
+      <a href="#thermique" style="--c:var(--lam)"><b>λ</b>Cond. thermique</a>
+      <a href="#electrique" style="--c:var(--sig)"><b>σ</b>Cond. électrique</a>
+      <a href="#acoustique" style="--c:var(--ac)"><b>α/R</b>Acoustique</a>
+      <a href="#synthese"><i></i>Tableau</a>
+      <a href="#pieges"><i></i>Pièges</a>
+      <a href="#quiz"><i></i>Quiz</a>
+    </div>
+  </nav>
+
+  <main>
+  <!-- ============ MASSE VOLUMIQUE ============ -->
+  <section class="prop" id="masse-volumique" style="--c:var(--rho)">
+    <div class="prop-head"><div class="sym">ρ</div><div><p class="eyebrow">Mesure la légèreté</p><h2>La masse volumique</h2></div></div>
+    <div class="prop-grid">
+      <div class="explain">
+        <p>C'est la <span class="hl">masse par unité de volume</span>. Elle dit si un objet est léger ou lourd <em>pour sa taille</em>. Un kilo de plumes et un kilo de plomb ont la même masse, mais pas du tout le même volume.</p>
+        <ul>
+          <li><b>m</b> : la masse de l'échantillon, en grammes (g)</li>
+          <li><b>V</b> : le volume, en centimètres cubes (cm³) ou en millilitres (mL)</li>
+        </ul>
+        <div class="example"><span class="lbl">Exemple</span>Un cube d'aluminium de 10 cm³ pèse 27 g.<br><span class="mono">ρ = 27 ÷ 10 = 2,7 g/cm³</span></div>
+        <p class="note">Bon à savoir : 1 cm³ = 1 mL, donc 1 g/cm³ = 1 g/mL = 1 kg/L = 1 000 kg/m³. Pour mesurer le volume d'un objet de forme compliquée, on le plonge dans une éprouvette graduée et on lit de combien le niveau d'eau monte.</p>
+      </div>
+      <aside class="fiche"><h3>Formules</h3><dl>
+        <dt>Symbole</dt><dd>ρ (rho)</dd>
+        <dt>Unité</dt><dd>g/cm³</dd>
+        <div class="formula">ρ = m / V<small>masse (g) divisée par volume (cm³)</small></div>
+      </dl></aside>
+    </div>
+    <div class="lab">
+      <div class="lab-title">Manip : calcule ρ et regarde si ça flotte</div>
+      <div class="presets" id="rho-presets"></div>
+      <div class="lab-grid">
+        <div style="display:grid;gap:14px">
+          <div class="fields">
+            <label class="field" for="m-mass">Masse m (g)<input id="m-mass" type="number" min="0" step="0.1" value="27"></label>
+            <label class="field" for="m-vol">Volume V (cm³)<input id="m-vol" type="number" min="0" step="0.1" value="10"></label>
+          </div>
+          <div class="result" aria-live="polite">
+            <span class="calc" id="m-calc"></span>
+            <span class="big" id="m-rho"></span>
+            <span class="note" id="m-conv"></span>
+            <span class="verdict" id="m-verdict"></span>
+          </div>
+        </div>
+        <svg viewBox="0 0 280 230" role="img" aria-label="Bac d'eau avec le bloc">
+          <rect x="30" y="70" width="220" height="140" fill="var(--water)" opacity=".55"/>
+          <path d="M30 20 V210 H250 V20" fill="none" stroke="var(--muted)" stroke-width="4"/>
+          <line x1="30" y1="70" x2="250" y2="70" stroke="var(--water)" stroke-width="2"/>
+          <text x="244" y="64" text-anchor="end" class="svg-muted" font-size="12">eau (ρ = 1 g/cm³)</text>
+          <g id="blk" style="transition:transform .9s cubic-bezier(.3,1.3,.5,1)">
+            <rect x="0" y="0" width="60" height="60" rx="4" fill="var(--rho)"/>
+            <text id="blk-t" x="30" y="35" text-anchor="middle" font-size="12" fill="var(--surface)" font-weight="700"></text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DENSITÉ ============ -->
+  <section class="prop" id="densite" style="--c:var(--dens)">
+    <div class="prop-head"><div class="sym">d</div><div><p class="eyebrow">Comparaison avec l'eau ou l'air</p><h2>La densité</h2></div></div>
+    <div class="prop-grid">
+      <div class="explain">
+        <p>La densité compare la masse volumique d'un matériau à celle de l'eau. C'est un <span class="hl">nombre sans unité</span> : les g/cm³ du haut et du bas s'annulent.</p>
+        <p>Elle répond à la question : <b>combien de fois le matériau est-il plus lourd que le même volume d'eau ?</b></p>
+        <div class="example"><span class="lbl">Exemple</span>Acier : ρ = 7,85 g/cm³.<br><span class="mono">d = 7,85 ÷ 1,00 = 7,85</span><br>Un morceau d'acier est 7,85 fois plus lourd que le même volume d'eau.</div>
+        <ul>
+          <li><b>d &lt; 1</b> : le matériau flotte sur l'eau (bois, liège, glace)</li>
+          <li><b>d &gt; 1</b> : le matériau coule (pierre, verre, métaux)</li>
+        </ul>
+        <p>Pour un <b>gaz</b>, on compare à l'air : ρ<sub>air</sub> = 1,225 g/L. Un gaz de densité inférieure à 1 monte (hélium), un gaz de densité supérieure à 1 descend (CO₂, butane).</p>
+      </div>
+      <aside class="fiche"><h3>Formules</h3><dl>
+        <dt>Symbole</dt><dd>d</dd>
+        <dt>Unité</dt><dd>aucune</dd>
+        <div class="formula">d = ρ<sub>mat</sub> / ρ<sub>eau</sub><small>ρ<sub>eau</sub> = 1,00 g/cm³</small></div>
+        <div class="formula">d = ρ<sub>gaz</sub> / ρ<sub>air</sub><small>ρ<sub>air</sub> = 1,225 g/L</small></div>
+      </dl></aside>
+    </div>
+    <div class="lab">
+      <div class="lab-title">Manip : le ballon monte-t-il ?</div>
+      <div class="presets" id="gas-presets"></div>
+      <div class="lab-grid">
+        <div style="display:grid;gap:14px">
+          <label class="field" for="g-rho">Masse volumique du gaz (g/L)<input id="g-rho" type="number" min="0" step="0.01" value="0.164"></label>
+          <div class="result" aria-live="polite">
+            <span class="calc" id="g-calc"></span>
+            <span class="big" id="g-d"></span>
+            <span class="verdict" id="g-verdict"></span>
+          </div>
+        </div>
+        <svg viewBox="0 0 240 220" role="img" aria-label="Ballon rempli de gaz">
+          <line x1="10" y1="210" x2="230" y2="210" stroke="var(--muted)" stroke-width="3"/>
+          <g id="balloon" style="transition:transform 1.1s ease">
+            <ellipse cx="120" cy="80" rx="36" ry="44" fill="var(--dens)"/>
+            <ellipse cx="108" cy="64" rx="8" ry="12" fill="var(--surface)" opacity=".35"/>
+            <path d="M120 124 q-6 18 4 34 q8 16 -2 30" fill="none" stroke="var(--muted)" stroke-width="2"/>
+            <text id="balloon-t" x="120" y="86" text-anchor="middle" font-size="14" fill="var(--surface)" font-weight="700"></text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DURETÉ ============ -->
+  <section class="prop" id="durete" style="--c:var(--dur)">
+    <div class="prop-head"><div class="sym small">1→10</div><div><p class="eyebrow">Résistance à la rayure</p><h2>La dureté</h2></div></div>
+    <div class="prop-grid">
+      <div class="explain">
+        <p>La dureté caractérise la <span class="hl">résistance d'un matériau à la pénétration, à la rayure ou à la déformation</span> par un autre corps plus dur.</p>
+        <p>En design et arts appliqués, elle influence :</p>
+        <ul>
+          <li>le <b>choix du matériau</b> selon l'usage (usure, chocs, rayures) : un plan de travail en granite plutôt qu'en pin</li>
+          <li>les <b>techniques de mise en œuvre</b> : un matériau dur demande des outils de coupe adaptés (disque diamant pour la céramique)</li>
+          <li>la <b>durabilité</b> d'un objet dans le temps</li>
+        </ul>
+        <div class="warn"><b>Attention :</b> dureté ≠ résistance mécanique ≠ fragilité. Le <b>verre</b> est dur (il résiste à la rayure) mais <b>fragile</b> (il se brise sous un choc).</div>
+        <p>On la classe avec l'<b>échelle de Mohs</b> (Friedrich Mohs, minéralogiste allemand, 1812) : 10 niveaux, du plus tendre (1, talc) au plus dur (10, diamant). <b>Règle :</b> un matériau raye tous ceux qui ont un indice plus petit que le sien.</p>
+      </div>
+      <aside class="fiche"><h3>Formules</h3><dl>
+        <dt>Symbole</dt><dd>aucun</dd>
+        <dt>Unité</dt><dd>aucune</dd>
+        <dt>Échelle</dt><dd>Mohs, de 1 à 10</dd>
+        <div class="formula">A raye B<small>si dureté de A &gt; dureté de B</small></div>
+      </dl></aside>
+    </div>
+    <div class="lab">
+      <div class="lab-title">L'échelle de Mohs : clique sur un niveau</div>
+      <div>
+        <div class="mohs" id="mohs"></div>
+        <div class="mohs-names" id="mohs-names"></div>
+      </div>
+      <div class="result" id="mohs-info" aria-live="polite"></div>
+      <p class="note">L'échelle classe les matériaux mais ne mesure pas « combien » ils sont durs : le diamant (10) est bien plus de deux fois plus dur que l'apatite (5).</p>
+    </div>
+    <div class="lab">
+      <div class="lab-title">Manip : test de rayure</div>
+      <div class="fields">
+        <label class="field" for="scr-a">Je frotte avec…<select id="scr-a"></select></label>
+        <label class="field" for="scr-b">…sur la surface de<select id="scr-b"></select></label>
+      </div>
+      <div class="result" aria-live="polite"><span class="verdict" id="scr-out"></span><span class="note" id="scr-why"></span></div>
+    </div>
+  </section>
+
+  <!-- ============ RIGIDITÉ ============ -->
+  <section class="prop" id="rigidite" style="--c:var(--young)">
+    <div class="prop-head"><div class="sym">E</div><div><p class="eyebrow">Rigide ou souple</p><h2>L'élasticité : le module de Young</h2></div></div>
+    <div class="prop-grid">
+      <div class="explain">
+        <p>Le module de Young (ou module d'élasticité) caractérise la <span class="hl">rigidité</span> d'un matériau : sa capacité à se déformer <b>élastiquement</b>, c'est-à-dire de façon réversible (il reprend sa forme), sous l'effet d'une contrainte, avant sa limite élastique.</p>
+        <ul>
+          <li><b>E élevé</b> → matériau <b>rigide</b>, il se déforme peu sous charge : acier, diamant</li>
+          <li><b>E faible</b> → matériau <b>souple</b>, flexible : caoutchouc, textiles</li>
+        </ul>
+        <div class="example"><span class="lbl">Exemple</span>Bois : E ≈ 10 GPa. Acier : E ≈ 200 GPa.<br>L'acier est environ <b>20 fois plus rigide</b> que le bois : à forme égale, une étagère en bois plie 20 fois plus qu'une étagère en acier.</div>
+        <p class="note">Conversion : 1 GPa = 1 000 MPa. Donc 200 GPa = 200 000 MPa.</p>
+      </div>
+      <aside class="fiche"><h3>Formules</h3><dl>
+        <dt>Symbole</dt><dd>E</dd>
+        <dt>Unité</dt><dd>MPa ou GPa</dd>
+        <div class="formula">E ↑ = rigide<small>E ↓ = souple</small></div>
+      </dl></aside>
+    </div>
+    <div class="lab">
+      <div class="lab-title">Manip : la même poutre, la même charge, des matériaux différents</div>
+      <div class="presets" id="e-presets"></div>
+      <div class="lab-grid">
+        <svg viewBox="0 0 300 230" role="img" aria-label="Poutre en porte-à-faux qui fléchit sous un poids">
+          <rect x="10" y="20" width="22" height="200" fill="var(--surface2)" stroke="var(--muted)"/>
+          <path d="M14 30 l14 14 M14 60 l14 14 M14 90 l14 14 M14 120 l14 14 M14 150 l14 14 M14 180 l14 14" class="svg-line" stroke-width="1.5"/>
+          <line x1="32" y1="60" x2="270" y2="60" stroke="var(--muted)" stroke-dasharray="4 5" stroke-width="1"/>
+          <path id="beam" d="M32 60 Q170 60 270 60" fill="none" stroke="var(--young)" stroke-width="12" stroke-linecap="round" style="transition:d .7s"/>
+          <g id="weight" style="transition:transform .7s">
+            <line x1="262" y1="60" x2="262" y2="80" stroke="var(--muted)" stroke-width="2"/>
+            <rect x="244" y="80" width="36" height="30" rx="4" class="svg-ink"/>
+            <text x="262" y="100" text-anchor="middle" font-size="12" fill="var(--surface)" font-weight="700">5 kg</text>
+          </g>
+        </svg>
+        <div class="result" aria-live="polite">
+          <span class="big" id="e-val"></span>
+          <span class="calc" id="e-mpa"></span>
+          <span class="verdict" id="e-verdict"></span>
+          <span class="note">La flexion est exagérée pour être visible, mais le classement est juste.</span>
+        </div>
+      </div>
+      <div class="bars" id="e-bars"></div>
+      <div class="axis"><span></span><div><span>0,01</span><span>0,1</span><span>1</span><span>10</span><span>100</span><span>1000</span></div><span>GPa (échelle log)</span></div>
+    </div>
+  </section>
+
+  <!-- ============ RÉSISTANCE ============ -->
+  <section class="prop" id="resistance" style="--c:var(--res)">
+    <div class="prop-head"><div class="sym small">RC RT</div><div><p class="eyebrow">Jusqu'où avant de casser</p><h2>La résistance à la compression et à la traction</h2></div></div>
+    <div class="prop-grid">
+      <div class="explain">
+        <p>La <b>résistance à la compression (RC)</b> est la <span class="hl">contrainte maximale</span> qu'un matériau supporte avant de se rompre ou de se déformer de façon irréversible quand on <b>l'écrase</b>.</p>
+        <p>La <b>résistance à la traction (RT)</b>, c'est la même chose quand on <b>l'étire</b>.</p>
+        <p>RC est essentielle pour les matériaux de structure : béton, pierre, bois en usage vertical (poteaux), céramiques.</p>
+        <div class="example"><span class="lbl">Ordre de grandeur</span>1 MPa = 1 newton par mm², soit à peu près le poids de <b>10 kg posé sur 1 cm²</b>.<br>Un béton courant (RC ≈ 30 MPa) supporte donc environ 300 kg sur chaque cm² avant de s'écraser.</div>
+        <div class="warn"><b>Le cas du béton :</b> il résiste très bien à la compression mais environ 10 fois moins bien à la traction. On le coule donc autour de barres d'acier (les armatures) qui reprennent la traction : c'est le <b>béton armé</b>.</div>
+      </div>
+      <aside class="fiche"><h3>Formules</h3><dl>
+        <dt>Symboles</dt><dd>RC et RT</dd>
+        <dt>Unité</dt><dd>MPa</dd>
+        <div class="formula">RC → écraser<small>RT → étirer</small></div>
+      </dl></aside>
+    </div>
+    <div class="lab">
+      <div class="lab-title">Manip : écrase ou étire jusqu'à la rupture</div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+        <div class="seg" id="r-mode"><button type="button" data-m="c" aria-pressed="true">Écraser (compression)</button><button type="button" data-m="t" aria-pressed="false">Étirer (traction)</button></div>
+      </div>
+      <div class="presets" id="r-presets"></div>
+      <div class="lab-grid">
+        <div style="display:grid;gap:12px">
+          <label class="field" for="r-slider">Contrainte appliquée : <b class="mono" id="r-stress"></b><input id="r-slider" type="range" min="0" max="300" value="120"></label>
+          <div class="result" aria-live="polite">
+            <span class="calc" id="r-limits"></span>
+            <span class="verdict" id="r-verdict"></span>
+          </div>
+        </div>
+        <svg viewBox="0 0 240 240" role="img" aria-label="Éprouvette soumise à une contrainte">
+          <g id="r-arrows"></g>
+          <g id="r-spec" style="transform-origin:120px 120px;transition:transform .3s">
+            <rect x="85" y="60" width="70" height="120" rx="4" fill="var(--res)" opacity=".85"/>
+            <path id="r-crack" d="M85 112 L105 118 L118 108 L134 124 L146 114 L155 120" fill="none" stroke="var(--surface)" stroke-width="4" opacity="0"/>
+          </g>
+        </svg>
+      </div>
+      <p class="note">Valeurs en ordre de grandeur, elles varient beaucoup selon la qualité du matériau.</p>
+    </div>
+    <details>
+      <summary>Voir pourquoi on arme le béton par en dessous</summary>
+      <svg viewBox="0 0 520 190" role="img" aria-label="Poutre en béton armé chargée au centre">
+        <path d="M260 6 V40" stroke="var(--ink)" stroke-width="3"/><path d="M252 30 L260 44 L268 30 Z" class="svg-ink"/>
+        <text x="272" y="24" font-size="13" class="svg-ink">charge</text>
+        <rect x="40" y="50" width="440" height="80" fill="var(--surface2)" stroke="var(--muted)"/>
+        <rect x="40" y="50" width="440" height="36" fill="var(--rho)" opacity=".25"/>
+        <rect x="40" y="94" width="440" height="36" fill="var(--res)" opacity=".25"/>
+        <text x="260" y="73" text-anchor="middle" font-size="13" class="svg-ink">haut de la poutre : COMPRESSION (le béton résiste bien)</text>
+        <text x="260" y="112" text-anchor="middle" font-size="13" class="svg-ink">bas : TRACTION (le béton fissure)</text>
+        <line x1="50" y1="122" x2="470" y2="122" stroke="var(--ink)" stroke-width="5"/>
+        <text x="260" y="150" text-anchor="middle" font-size="13" class="svg-muted">↑ barres d'acier (armatures) placées là où ça tire</text>
+        <path d="M60 130 l-14 24 h28 z M460 130 l-14 24 h28 z" fill="var(--muted)"/>
+        <text x="60" y="174" text-anchor="middle" font-size="12" class="svg-muted">appui</text><text x="460" y="174" text-anchor="middle" font-size="12" class="svg-muted">appui</text>
+      </svg>
+    </details>
+  </section>
+
+  <!-- ============ THERMIQUE ============ -->
+  <section class="prop" id="thermique" style="--c:var(--lam)">
+    <div class="prop-head"><div class="sym">λ</div><div><p class="eyebrow">Transmettre la chaleur</p><h2>La conductivité thermique</h2></div></div>
+    <div class="prop-grid">
+      <div class="explain">
+        <p>Elle mesure la <span class="hl">capacité d'un matériau à transmettre la chaleur</span>.</p>
+        <ul>
+          <li><b>Conducteur thermique</b> (λ élevé) : métaux comme le cuivre, l'aluminium. On s'en sert pour <b>évacuer ou transmettre</b> la chaleur : fond de casserole, radiateur, dissipateur d'ordinateur.</li>
+          <li><b>Isolant thermique</b> (λ faible) : bois, laine, polystyrène, air. On s'en sert pour <b>limiter les échanges</b> de chaleur : manche de casserole, isolation d'un mur, gobelet.</li>
+        </ul>
+        <div class="example"><span class="lbl">Exemple</span>Cuivre : λ ≈ 390 W/(m·K). Bois : λ ≈ 0,15 W/(m·K).<br>Le cuivre conduit la chaleur environ <b>2 600 fois mieux</b> que le bois. C'est pour ça qu'une poêle a un corps en métal et un manche en bois.</div>
+      </div>
+      <aside class="fiche"><h3>Formules</h3><dl>
+        <dt>Symbole</dt><dd>λ (lambda)</dd>
+        <dt>Unité</dt><dd>W/(m·K)</dd>
+        <div class="formula">λ ↑ conducteur<small>λ ↓ isolant</small></div>
+      </dl><p class="note" style="padding:0 14px 12px">Watt par mètre-kelvin</p></aside>
+    </div>
+    <div class="lab">
+      <div class="lab-title">Classement : clique sur un matériau</div>
+      <div class="legend"><span style="--sw:var(--lam)">Conducteur</span><span style="--sw:color-mix(in srgb,var(--lam) 40%,var(--surface2))">Isolant ou intermédiaire</span></div>
+      <div class="bars" id="l-bars"></div>
+      <div class="axis"><span></span><div><span>0,01</span><span>0,1</span><span>1</span><span>10</span><span>100</span><span>1000</span></div><span>W/(m·K) log</span></div>
+      <div class="result" id="l-info" aria-live="polite"></div>
+    </div>
+    <details>
+      <summary>Pourquoi une barre de métal paraît plus froide qu'une planche de bois dans la même pièce ?</summary>
+      <p>Les deux sont à la même température (20 °C). Mais ta main est à environ 33 °C. Le métal, très conducteur, <b>emporte rapidement la chaleur</b> de ta main : tu ressens du froid. Le bois, isolant, la laisse sur place : il paraît « tiède ». Ta peau ne mesure pas la température, elle mesure la vitesse à laquelle tu perds de la chaleur.</p>
+    </details>
+  </section>
+
+  <!-- ============ ÉLECTRIQUE ============ -->
+  <section class="prop" id="electrique" style="--c:var(--sig)">
+    <div class="prop-head"><div class="sym">σ</div><div><p class="eyebrow">Laisser passer le courant</p><h2>La conductivité électrique</h2></div></div>
+    <div class="prop-grid">
+      <div class="explain">
+        <p>Elle mesure la <span class="hl">capacité d'un matériau à laisser circuler le courant électrique</span>.</p>
+        <p>C'est l'<b>inverse de la résistivité</b>. Attention, la résistivité se note aussi <b>ρ</b> (comme la masse volumique !) mais son unité est l'<b>Ω·m</b> (ohm-mètre).</p>
+        <ul>
+          <li><b>Conducteurs</b> : métaux (cuivre, argent, or, aluminium) → fils électriques, contacts</li>
+          <li><b>Isolants</b> : plastiques, verre, céramique, bois sec → gaines, prises, poignées d'outils</li>
+          <li><b>Semi-conducteurs</b> : silicium → puces et composants électroniques</li>
+        </ul>
+        <div class="example"><span class="lbl">Exemple</span>Un fil électrique : <b>âme en cuivre</b> (conducteur) qui transporte le courant, <b>gaine en PVC</b> (isolant) qui protège celui qui le touche.</div>
+      </div>
+      <aside class="fiche"><h3>Formules</h3><dl>
+        <dt>Symbole</dt><dd>σ (sigma)</dd>
+        <dt>Unité</dt><dd>S/m</dd>
+        <div class="formula">σ = 1 / ρ<small>ρ = résistivité, en Ω·m</small></div>
+      </dl><p class="note" style="padding:0 14px 12px">Siemens par mètre</p></aside>
+    </div>
+    <div class="lab">
+      <div class="lab-title">Manip : place un matériau dans le circuit</div>
+      <div class="presets" id="s-presets"></div>
+      <div class="lab-grid">
+        <svg viewBox="0 0 300 220" role="img" aria-label="Circuit électrique avec pile, ampoule et échantillon">
+          <path id="wire" d="M50 150 V50 H130 M170 50 H250 V150 M250 150 H190 M110 150 H50" fill="none" stroke="var(--muted)" stroke-width="3"/>
+          <path id="cur" d="M50 150 V50 H250 V150 H50" fill="none" stroke="var(--glow)" stroke-width="3" class="flow" opacity="0"/>
+          <circle id="halo" cx="150" cy="50" r="34" fill="var(--glow)" opacity="0"/>
+          <circle id="bulb" cx="150" cy="50" r="18" fill="var(--surface2)" stroke="var(--muted)" stroke-width="3"/>
+          <path d="M141 50 q4 -8 9 0 q5 8 9 0" fill="none" stroke="var(--muted)" stroke-width="2"/>
+          <rect x="36" y="88" width="28" height="44" rx="3" fill="var(--surface2)" stroke="var(--muted)" stroke-width="2"/>
+          <rect x="44" y="82" width="12" height="6" class="svg-muted"/>
+          <text x="50" y="114" text-anchor="middle" font-size="14" class="svg-ink" font-weight="700">+</text>
+          <rect id="sample" x="110" y="138" width="80" height="24" rx="4" fill="var(--sig)"/>
+          <text id="sample-t" x="150" y="186" text-anchor="middle" font-size="13" class="svg-ink"></text>
+        </svg>
+        <div class="result" aria-live="polite">
+          <span class="verdict" id="s-verdict"></span>
+          <span class="calc">σ = <b class="mono" id="s-sig"></b> S/m</span>
+          <span class="calc">résistivité ρ = 1/σ = <b class="mono" id="s-rho"></b> Ω·m</span>
+          <span class="note">Plus σ est grand, plus ρ est petit : les deux disent la même chose dans un sens opposé.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ACOUSTIQUE ============ -->
+  <section class="prop" id="acoustique" style="--c:var(--ac)">
+    <div class="prop-head"><div class="sym small">α R</div><div><p class="eyebrow">Pour information</p><h2>Les propriétés acoustiques</h2></div></div>
+    <div class="prop-grid">
+      <div class="explain">
+        <p><b>Le coefficient d'absorption acoustique α (alpha)</b> mesure la capacité d'un matériau à <span class="hl">absorber le son</span> plutôt qu'à le renvoyer. Nombre sans unité entre 0 (tout est réfléchi) et 1 (tout est absorbé). Il change selon la fréquence du son, d'où une valeur moyenne pondérée notée α<sub>w</sub>. Il sert à corriger <b>l'écho dans une pièce</b>.</p>
+        <p><b>L'indice d'affaiblissement acoustique R</b> (ou R<sub>w</sub>) mesure la capacité d'une paroi à <span class="hl">empêcher le son de la traverser</span> : c'est l'isolation phonique entre deux pièces. Il s'exprime en décibels (dB). Plus R est grand, mieux la paroi bloque le son.</p>
+        <div class="warn"><b>Absorber ≠ isoler.</b> Une mousse très absorbante (α proche de 1) réduit l'écho mais laisse passer le bruit vers le voisin. Un mur lourd en béton isole bien (R élevé) mais renvoie le son dans la pièce (α proche de 0).</div>
+      </div>
+      <aside class="fiche"><h3>Formules</h3><dl>
+        <dt>Absorption</dt><dd>α, sans unité</dd>
+        <dt>Valeurs</dt><dd>de 0 à 1</dd>
+        <dt>Isolation</dt><dd>R, en dB</dd>
+      </dl></aside>
+    </div>
+    <div class="lab">
+      <div class="lab-title">Manip : le son frappe une paroi</div>
+      <div class="presets" id="a-presets"></div>
+      <div class="lab-grid">
+        <svg viewBox="0 0 300 200" role="img" aria-label="Son réfléchi et absorbé par une paroi">
+          <defs><marker id="ah" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--ac)"/></marker></defs>
+          <rect x="200" y="20" width="36" height="160" fill="var(--surface2)" stroke="var(--muted)"/>
+          <rect id="a-abs" x="200" y="20" width="36" height="160" fill="var(--ac)" opacity=".2"/>
+          <line x1="30" y1="40" x2="190" y2="100" stroke="var(--ac)" stroke-width="12" marker-end="url(#ah)"/>
+          <line id="a-ref" x1="190" y1="104" x2="40" y2="170" stroke="var(--ac)" stroke-width="8" opacity=".75" marker-end="url(#ah)"/>
+          <text x="30" y="30" font-size="12" class="svg-muted">son émis</text>
+          <text id="a-ref-t" x="40" y="192" font-size="12" class="svg-muted">son réfléchi</text>
+          <text x="218" y="196" font-size="12" text-anchor="middle" class="svg-muted">paroi</text>
+        </svg>
+        <div style="display:grid;gap:12px">
+          <label class="field" for="a-slider">Coefficient α : <b class="mono" id="a-val"></b><input id="a-slider" type="range" min="0" max="100" value="10"></label>
+          <div class="result" aria-live="polite"><span class="verdict" id="a-out"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SYNTHÈSE ============ -->
+  <section class="prop" id="synthese" style="--c:var(--accent)">
+    <div class="prop-head"><div class="sym small">∑</div><div><p class="eyebrow">Conclusion de la fiche</p><h2>Tableau des grandeurs mesurées</h2></div></div>
+    <p class="explain">C'est le tableau à construire en conclusion. Active le mode entraînement pour cacher les réponses, essaie de les retrouver de tête, puis clique sur chaque « ? » pour vérifier.</p>
+    <div class="tbl-tools">
+      <button type="button" class="btn" id="t-train">Mode entraînement : cacher les réponses</button>
+      <button type="button" class="btn ghost" id="t-all" hidden>Tout révéler</button>
+    </div>
+    <div class="tbl-wrap">
+      <table id="tbl">
+        <thead><tr><th>Propriété</th><th>Symbole</th><th>Unité</th><th>Ce qu'elle mesure</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ PIÈGES ============ -->
+  <section class="prop" id="pieges" style="--c:var(--bad)">
+    <div class="prop-head"><div class="sym">!</div><div><p class="eyebrow">Les erreurs qui coûtent des points</p><h2>Pièges à éviter au DS</h2></div></div>
+    <div class="traps">
+      <div class="trap"><h3>Deux ρ différents</h3><p>ρ désigne la <b>masse volumique</b> (g/cm³) et aussi la <b>résistivité électrique</b> (Ω·m). C'est l'unité et le contexte qui disent de quoi on parle.</p></div>
+      <div class="trap"><h3>La densité n'a pas d'unité</h3><p><span class="no">✗ d = 2,7 g/cm³</span><br><span class="yes">✓ d = 2,7</span></p></div>
+      <div class="trap"><h3>Dur ne veut pas dire solide</h3><p>Dureté = résistance à la <b>rayure</b>. Fragilité = tendance à <b>casser au choc</b>. Le verre est dur <b>et</b> fragile.</p></div>
+      <div class="trap"><h3>MPa ou GPa ?</h3><p>1 GPa = 1 000 MPa. Le module de Young s'écrit souvent en GPa, les résistances RC et RT en MPa.</p></div>
+      <div class="trap"><h3>Rigide ≠ résistant</h3><p>E dit si le matériau <b>plie</b> peu. RC et RT disent quand il <b>casse</b>. Le verre est rigide mais casse en traction.</p></div>
+      <div class="trap"><h3>Absorber ≠ isoler</h3><p>α (sans unité, 0 à 1) concerne l'écho dans la pièce. R (en dB) concerne le bruit qui traverse le mur.</p></div>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="prop" id="quiz" style="--c:var(--accent)">
+    <div class="prop-head"><div class="sym">?</div><div><p class="eyebrow">Teste-toi</p><h2>Quiz de révision</h2></div></div>
+    <div class="quiz">
+      <div class="qhead"><span class="score" id="q-score">Score : 0 / 0</span><button type="button" class="btn ghost" id="q-reset">Recommencer</button></div>
+      <div id="q-list" class="quiz"></div>
+    </div>
+  </section>
+  </main>
+
+  <footer>Les valeurs numériques sont des ordres de grandeur courants : elles varient selon l'essence de bois, la nuance d'acier, la qualité du béton, la température…</footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmt = (x, d = 2) => Number(x).toLocaleString('fr-FR', { maximumFractionDigits: d });
+function sci(x){
+  if (x === 0) return '0';
+  const e = Math.floor(Math.log10(x));
+  if (e >= -2 && e <= 4) return fmt(x, 3);
+  const m = x / Math.pow(10, e);
+  return fmt(m, 2) + ' × 10<sup>' + String(e).replace('-', '−') + '</sup>';
+}
+function presetRow(el, items, label, onPick){
+  el.innerHTML = '';
+  items.forEach((it, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = it[label]; b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', () => { el.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); onPick(it, i); });
+    el.appendChild(b);
+  });
+  return el.querySelectorAll('button');
+}
+
+/* ---- Masse volumique ---- */
+const solids = [
+  {n:'Liège', r:0.24},{n:'Bois de pin', r:0.5},{n:'Glace', r:0.92},{n:'Eau', r:1},{n:'PVC', r:1.4},
+  {n:'Verre', r:2.5},{n:'Aluminium', r:2.7},{n:'Acier', r:7.85},{n:'Cuivre', r:8.96},{n:'Plomb', r:11.3},{n:'Or', r:19.3}];
+const rhoBtns = presetRow($('rho-presets'), solids, 'n', it => { $('m-vol').value = 10; $('m-mass').value = +(it.r * 10).toFixed(2); updRho(it.n); });
+function updRho(name){
+  const m = parseFloat($('m-mass').value), v = parseFloat($('m-vol').value);
+  if (!(v > 0) || !(m >= 0)) { $('m-calc').textContent = ''; $('m-rho').textContent = '—'; $('m-conv').textContent = ''; $('m-verdict').textContent = 'Entre une masse et un volume positifs (V ne peut pas valoir 0).'; return; }
+  const r = m / v;
+  if (!name) rhoBtns.forEach(b => b.setAttribute('aria-pressed', 'false'));
+  $('m-calc').textContent = `ρ = m / V = ${fmt(m)} / ${fmt(v)}`;
+  $('m-rho').textContent = `ρ = ${fmt(r, 3)} g/cm³`;
+  $('m-conv').textContent = `soit ${fmt(r * 1000, 0)} kg/m³ · densité d = ${fmt(r, 3)}`;
+  $('m-verdict').textContent = r < 1 ? 'd < 1 : le bloc flotte.' : r === 1 ? 'd = 1 : le bloc reste entre deux eaux.' : 'd > 1 : le bloc coule.';
+  let top = r <= 1 ? 70 - 60 * (1 - r) : 150;
+  if (r === 1) top = 100;
+  $('blk').style.transform = `translate(110px, ${top}px)`;
+  $('blk-t').textContent = name || fmt(r, 2);
+}
+['m-mass','m-vol'].forEach(id => $(id).addEventListener('input', () => updRho()));
+rhoBtns[6].setAttribute('aria-pressed', 'true'); updRho('Aluminium');
+
+/* ---- Densité gaz ---- */
+const gases = [{n:'Hélium', r:0.164},{n:'Dihydrogène', r:0.084},{n:'Air', r:1.225},{n:'CO₂', r:1.84},{n:'Butane', r:2.48}];
+const gasBtns = presetRow($('gas-presets'), gases, 'n', it => { $('g-rho').value = it.r; updGas(it.n); });
+function updGas(name){
+  const r = parseFloat($('g-rho').value);
+  if (!(r > 0)) { $('g-d').textContent = '—'; $('g-calc').textContent = ''; $('g-verdict').textContent = 'Entre une masse volumique positive.'; return; }
+  if (!name) gasBtns.forEach(b => b.setAttribute('aria-pressed', 'false'));
+  const d = r / 1.225;
+  $('g-calc').textContent = `d = ρgaz / ρair = ${fmt(r, 3)} / 1,225`;
+  $('g-d').textContent = `d = ${fmt(d, 2)}`;
+  $('g-verdict').textContent = d < 0.98 ? 'd < 1 : plus léger que l\'air, le ballon s\'envole.' : d <= 1.02 ? 'd ≈ 1 : le ballon flotte dans l\'air.' : 'd > 1 : plus lourd que l\'air, le ballon tombe.';
+  const y = d < 0.98 ? -40 : d <= 1.02 ? 10 : 58;
+  $('balloon').style.transform = `translateY(${y}px)`;
+  $('balloon-t').textContent = fmt(d, 2);
+}
+$('g-rho').addEventListener('input', () => updGas());
+gasBtns[0].setAttribute('aria-pressed', 'true'); updGas('Hélium');
+
+/* ---- Mohs ---- */
+const mohs = [
+  [1,'Talc','Se raye à l\'ongle. Utilisé en poudre (talc pour bébé).'],
+  [2,'Gypse','Se raye à l\'ongle. Sert à fabriquer le plâtre.'],
+  [3,'Calcite','Rayée par une pièce de cuivre. Compose le marbre et la craie.'],
+  [4,'Fluorine','Rayée facilement par une lame de couteau.'],
+  [5,'Apatite','Rayée par le couteau avec effort. L\'émail des dents est autour de 5.'],
+  [6,'Orthose','Feldspath, présent dans le granite. Raye le verre.'],
+  [7,'Quartz','Le sable est surtout du quartz. Raye le verre et l\'acier.'],
+  [8,'Topaze','Pierre fine utilisée en bijouterie.'],
+  [9,'Corindon','Rubis et saphir. Sert d\'abrasif (papier émeri).'],
+  [10,'Diamant','Le plus dur. Utilisé pour les outils de coupe (disques, forets).']];
+mohs.forEach(([n, name]) => {
+  const b = document.createElement('button'); b.type = 'button'; b.style.setProperty('--n', n); b.textContent = n;
+  b.setAttribute('aria-label', `${n} – ${name}`); b.setAttribute('aria-pressed', 'false');
+  b.addEventListener('click', () => showMohs(n - 1)); $('mohs').appendChild(b);
+  const s = document.createElement('span'); s.textContent = name; $('mohs-names').appendChild(s);
+});
+function showMohs(i){
+  $('mohs').querySelectorAll('button').forEach((b, k) => b.setAttribute('aria-pressed', k === i ? 'true' : 'false'));
+  const [n, name, txt] = mohs[i];
+  $('mohs-info').innerHTML = `<span class="big">${n} · ${name}</span><span>${txt}</span><span class="note">${n > 1 ? `Il raye les niveaux 1 à ${n - 1}.` : 'Il ne raye aucun autre minéral.'} ${n < 10 ? `Il est rayé par les niveaux ${n + 1} à 10.` : 'Aucun minéral ne le raye.'}</span>`;
+}
+showMohs(6);
+const scr = [
+  {n:'Talc (1)', h:1},{n:'Gypse / plâtre (2)', h:2},{n:'Ongle (2,5)', h:2.5},{n:'Pièce de cuivre (3)', h:3},{n:'Marbre, calcite (3)', h:3},
+  {n:'Lame de couteau (5,5)', h:5.5},{n:'Verre (5,5)', h:5.5},{n:'Lime en acier (6,5)', h:6.5},{n:'Quartz, sable (7)', h:7},{n:'Saphir (9)', h:9},{n:'Diamant (10)', h:10}];
+['scr-a','scr-b'].forEach(id => scr.forEach((s, i) => { const o = document.createElement('option'); o.value = i; o.textContent = s.n; $(id).appendChild(o); }));
+$('scr-a').value = 8; $('scr-b').value = 6;
+function updScr(){
+  const a = scr[$('scr-a').value], b = scr[$('scr-b').value];
+  if (a.h > b.h) { $('scr-out').textContent = `✓ ${a.n.split(' (')[0]} raye ${b.n.split(' (')[0].toLowerCase()}.`; $('scr-why').textContent = `${fmt(a.h,1)} > ${fmt(b.h,1)} : le plus dur raye le plus tendre.`; }
+  else if (a.h < b.h) { $('scr-out').textContent = `✗ Pas de rayure. C'est ${a.n.split(' (')[0].toLowerCase()} qui risque de s'user.`; $('scr-why').textContent = `${fmt(a.h,1)} < ${fmt(b.h,1)} : un matériau plus tendre ne peut pas rayer un plus dur.`; }
+  else { $('scr-out').textContent = '≈ Même dureté : rayure faible ou nulle, les deux s\'usent un peu.'; $('scr-why').textContent = `${fmt(a.h,1)} = ${fmt(b.h,1)}`; }
+}
+['scr-a','scr-b'].forEach(id => $(id).addEventListener('change', updScr)); updScr();
+
+/* ---- Barres log ---- */
+function logBars(el, data, min, max, unit, onPick, isoFn){
+  el.innerHTML = '';
+  const span = Math.log10(max) - Math.log10(min);
+  const btns = data.map((d, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'bar' + (isoFn && isoFn(d) ? ' iso' : ''); b.setAttribute('aria-pressed', 'false');
+    const w = Math.max(1.5, (Math.log10(d.v) - Math.log10(min)) / span * 100);
+    b.innerHTML = `<span class="name">${d.n}</span><span class="track"><span class="fill" style="width:${w}%"></span></span><span class="val">${fmt(d.v, 3)}</span>`;
+    b.addEventListener('click', () => { btns.forEach(x => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); onPick(d, i); });
+    el.appendChild(b); return b;
+  });
+  return btns;
+}
+
+/* ---- Young ---- */
+const young = [{n:'Caoutchouc', v:0.05},{n:'Polyéthylène', v:0.8},{n:'Bois', v:10},{n:'Béton', v:30},{n:'Verre', v:70},{n:'Aluminium', v:70},{n:'Acier', v:200},{n:'Diamant', v:1000}];
+let eBars, eBtns;
+function pickE(d, i){
+  eBtns.forEach((b, k) => b.setAttribute('aria-pressed', k === i ? 'true' : 'false'));
+  eBars.forEach((b, k) => b.setAttribute('aria-pressed', k === i ? 'true' : 'false'));
+  const defl = 2 + 140 * (3 - Math.log10(d.v)) / 5;
+  $('beam').setAttribute('d', `M32 60 Q170 60 270 ${60 + defl}`);
+  $('weight').style.transform = `translateY(${defl}px)`;
+  $('e-val').textContent = `${d.n} : E ≈ ${fmt(d.v, 2)} GPa`;
+  $('e-mpa').textContent = `= ${fmt(d.v * 1000, 0)} MPa`;
+  $('e-verdict').textContent = d.v >= 50 ? 'Très rigide : la poutre plie à peine.' : d.v >= 5 ? 'Assez rigide : elle plie un peu.' : 'Souple : elle plie beaucoup sous la charge.';
+}
+eBtns = presetRow($('e-presets'), young, 'n', pickE);
+eBars = logBars($('e-bars'), young, 0.01, 1000, 'GPa', pickE);
+pickE(young[2], 2);
+
+/* ---- Résistance ---- */
+const resist = [{n:'Béton', c:30, t:3},{n:'Brique', c:20, t:2},{n:'Granite', c:150, t:10},{n:'Bois (sens des fibres)', c:45, t:90},{n:'Verre', c:1000, t:40},{n:'Acier', c:400, t:400}];
+let rMat = resist[0], rMode = 'c';
+const rBtns = presetRow($('r-presets'), resist, 'n', it => { rMat = it; updRes(); });
+rBtns[0].setAttribute('aria-pressed', 'true');
+$('r-mode').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+  $('r-mode').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); rMode = b.dataset.m; updRes();
+}));
+function updRes(){
+  const s = Math.pow(10, $('r-slider').value / 100);
+  const lim = rMode === 'c' ? rMat.c : rMat.t;
+  const ratio = s / lim, k = Math.min(ratio, 1);
+  $('r-stress').textContent = `${fmt(s, s < 10 ? 1 : 0)} MPa`;
+  $('r-limits').innerHTML = `${rMat.n} : RC ≈ ${fmt(rMat.c)} MPa · RT ≈ ${fmt(rMat.t)} MPa`;
+  const broken = ratio >= 1;
+  $('r-verdict').textContent = broken
+    ? `Rupture ! ${fmt(s, 0)} MPa dépasse ${rMode === 'c' ? 'RC' : 'RT'} = ${fmt(lim)} MPa.`
+    : `Ça tient : ${Math.round(ratio * 100)} % de ${rMode === 'c' ? 'RC' : 'RT'}.`;
+  $('r-verdict').style.color = broken ? 'var(--bad)' : 'var(--good)';
+  $('r-spec').style.transform = rMode === 'c' ? `scale(${1 + 0.12 * k}, ${1 - 0.18 * k})` : `scale(${1 - 0.1 * k}, ${1 + 0.18 * k})`;
+  $('r-crack').setAttribute('opacity', broken ? 1 : 0);
+  const c = 'var(--ink)';
+  $('r-arrows').innerHTML = rMode === 'c'
+    ? `<path d="M120 4 V40 M110 30 L120 44 L130 30" stroke="${c}" stroke-width="4" fill="none"/><path d="M120 236 V200 M110 210 L120 196 L130 210" stroke="${c}" stroke-width="4" fill="none"/>`
+    : `<path d="M120 44 V6 M110 16 L120 2 L130 16" stroke="${c}" stroke-width="4" fill="none"/><path d="M120 196 V234 M110 224 L120 238 L130 224" stroke="${c}" stroke-width="4" fill="none"/>`;
+}
+$('r-slider').addEventListener('input', updRes); updRes();
+
+/* ---- Thermique ---- */
+const therm = [
+  {n:'Cuivre', v:390, u:'Fonds de casseroles haut de gamme, échangeurs, dissipateurs.'},
+  {n:'Aluminium', v:237, u:'Radiateurs, dissipateurs d\'ordinateur, poêles.'},
+  {n:'Acier', v:50, u:'Casseroles inox, plaques de cuisson.'},
+  {n:'Granite', v:3, u:'Intermédiaire : stocke la chaleur, paraît froid au toucher.'},
+  {n:'Béton', v:1.5, u:'Intermédiaire : un mur en béton seul isole mal, il faut ajouter un isolant.'},
+  {n:'Verre', v:1, u:'Intermédiaire : c\'est la lame d\'air ou de gaz du double vitrage qui isole.'},
+  {n:'Eau', v:0.6, u:'Intermédiaire : on a vite froid dans l\'eau à 20 °C.'},
+  {n:'Bois', v:0.15, u:'Isolant : manches d\'ustensiles, cadres de fenêtres, maisons ossature bois.'},
+  {n:'Laine de verre', v:0.04, u:'Isolant : isolation des combles et des murs.'},
+  {n:'Polystyrène', v:0.035, u:'Isolant : emballages isothermes, plaques d\'isolation.'},
+  {n:'Air immobile', v:0.026, u:'Très isolant : les laines et mousses isolent grâce à l\'air emprisonné.'}];
+const kind = v => v >= 10 ? 'Conducteur thermique' : v <= 0.2 ? 'Isolant thermique' : 'Intermédiaire';
+const lBars = logBars($('l-bars'), therm, 0.01, 1000, '', d => {
+  $('l-info').innerHTML = `<span class="big">${d.n} : λ ≈ ${fmt(d.v, 3)} W/(m·K)</span><span class="verdict">${kind(d.v)}</span><span>${d.u}</span>`;
+}, d => d.v < 10);
+lBars[0].click();
+
+/* ---- Électrique ---- */
+const elec = [
+  {n:'Argent', s:6.3e7},{n:'Cuivre', s:5.96e7},{n:'Or', s:4.1e7},{n:'Aluminium', s:3.8e7},{n:'Graphite (mine)', s:1e5},
+  {n:'Silicium pur', s:4.3e-4},{n:'Eau du robinet', s:5e-2},{n:'Verre', s:1e-12},{n:'Céramique', s:1e-13},{n:'Bois sec', s:1e-14},{n:'PVC (plastique)', s:1e-15}];
+const sBtns = presetRow($('s-presets'), elec, 'n', it => updSig(it));
+function updSig(it){
+  const cond = it.s >= 1e4, semi = !cond && it.s >= 1e-6;
+  $('s-sig').innerHTML = sci(it.s); $('s-rho').innerHTML = sci(1 / it.s);
+  $('sample-t').textContent = it.n;
+  $('s-verdict').textContent = cond ? `Conducteur : la lampe s'allume.` : semi ? `Faiblement conducteur : la lampe ne s'allume presque pas.` : `Isolant : aucun courant, la lampe reste éteinte.`;
+  if (it.n === 'Silicium pur') $('s-verdict').textContent = 'Semi-conducteur : très peu de courant à l\'état pur. Dopé, il devient la base de l\'électronique.';
+  $('halo').setAttribute('opacity', cond ? .45 : semi ? .08 : 0);
+  $('bulb').setAttribute('fill', cond ? 'var(--glow)' : 'var(--surface2)');
+  $('cur').setAttribute('opacity', cond ? .9 : semi ? .25 : 0);
+  $('cur').style.setProperty('--spd', cond ? '0.6s' : '3s');
+  $('sample').setAttribute('fill', cond ? 'var(--sig)' : semi ? 'color-mix(in srgb, var(--sig) 45%, var(--surface2))' : 'var(--muted)');
+}
+sBtns[1].click();
+
+/* ---- Acoustique ---- */
+const acou = [{n:'Béton brut', a:0.02},{n:'Verre', a:0.03},{n:'Bois verni', a:0.1},{n:'Moquette', a:0.3},{n:'Rideau épais', a:0.5},{n:'Mousse acoustique', a:0.8},{n:'Laine minérale', a:0.9}];
+const aBtns = presetRow($('a-presets'), acou, 'n', it => { $('a-slider').value = Math.round(it.a * 100); updAc(true); });
+function updAc(keep){
+  if (!keep) aBtns.forEach(b => b.setAttribute('aria-pressed', 'false'));
+  const a = $('a-slider').value / 100;
+  $('a-val').textContent = fmt(a, 2);
+  $('a-ref').setAttribute('stroke-width', 1 + 13 * (1 - a));
+  $('a-ref').setAttribute('opacity', 0.2 + 0.7 * (1 - a));
+  $('a-abs').setAttribute('opacity', 0.1 + 0.8 * a);
+  $('a-out').textContent = `${Math.round(a * 100)} % du son absorbé, ${Math.round((1 - a) * 100)} % renvoyé dans la pièce. ` + (a < 0.2 ? 'Surface réfléchissante : la pièce résonne.' : a < 0.6 ? 'Absorption moyenne.' : 'Très absorbant : idéal contre l\'écho.');
+}
+$('a-slider').addEventListener('input', () => updAc(false)); aBtns[0].click();
+
+/* ---- Tableau ---- */
+const rows = [
+  ['Masse volumique','ρ (rho)','g/cm³','La masse par unité de volume : la légèreté du matériau','var(--rho)'],
+  ['Densité','d','sans unité','Combien de fois le matériau est plus lourd que l\'eau (ou l\'air pour un gaz)','var(--dens)'],
+  ['Dureté','pas de symbole','sans unité (échelle de Mohs 1 à 10)','La résistance à la rayure et à la pénétration','var(--dur)'],
+  ['Rigidité (module de Young)','E','MPa ou GPa','La capacité à ne pas se déformer sous une charge','var(--young)'],
+  ['Résistance à la compression','RC','MPa','La contrainte maximale avant rupture quand on écrase','var(--res)'],
+  ['Résistance à la traction','RT','MPa','La contrainte maximale avant rupture quand on étire','var(--res)'],
+  ['Conductivité thermique','λ (lambda)','W/(m·K)','La capacité à transmettre la chaleur','var(--lam)'],
+  ['Conductivité électrique','σ (sigma)','S/m','La capacité à laisser passer le courant électrique','var(--sig)'],
+  ['Résistivité électrique','ρ (rho)','Ω·m','L\'inverse de σ : l\'opposition au passage du courant','var(--sig)'],
+  ['Absorption acoustique (info)','α (alpha)','sans unité, de 0 à 1','La part du son absorbée au lieu d\'être réfléchie','var(--ac)', true],
+  ['Affaiblissement acoustique (info)','R (ou Rw)','dB','La capacité d\'une paroi à bloquer le son','var(--ac)', true]];
+let training = false;
+function drawTable(){
+  const tb = $('tbl').querySelector('tbody'); tb.innerHTML = '';
+  rows.forEach(r => {
+    const tr = document.createElement('tr'); tr.style.setProperty('--c', r[4]); if (r[5]) tr.className = 'info';
+    const cell = (txt, cls) => { const td = document.createElement('td'); td.className = cls;
+      if (training && cls !== 'pname') { const b = document.createElement('button'); b.type = 'button'; b.className = 'reveal'; b.textContent = '?'; b.setAttribute('aria-label', 'Révéler la réponse');
+        b.addEventListener('click', () => { td.textContent = txt; }); td.appendChild(b); } else td.textContent = txt; return td; };
+    tr.append(cell(r[0], 'pname'), cell(r[1], 's'), cell(r[2], 'u'), cell(r[3], 'm'));
+    tb.appendChild(tr);
+  });
+}
+$('t-train').addEventListener('click', () => { training = !training; $('t-train').textContent = training ? 'Quitter le mode entraînement' : 'Mode entraînement : cacher les réponses'; $('t-all').hidden = !training; drawTable(); });
+$('t-all').addEventListener('click', () => $('tbl').querySelectorAll('.reveal').forEach(b => b.click()));
+drawTable();
+
+/* ---- Quiz ---- */
+const Q = [
+  ['Un bloc de 54 g occupe un volume de 20 cm³. Quelle est sa masse volumique ?', ['2,7 g/cm³','0,37 g/cm³','1 080 g/cm³','34 g/cm³'], 0, 'ρ = m / V = 54 / 20 = 2,7 g/cm³. C\'est de l\'aluminium.'],
+  ['Quelle est l\'unité de la densité ?', ['g/cm³','kg/m³','Elle n\'a pas d\'unité','g/L'], 2, 'd = ρmatériau / ρeau : les unités s\'annulent.'],
+  ['Un objet a une densité de 0,8. Dans l\'eau, il…', ['coule','flotte','se dissout','reste au fond puis remonte'], 1, 'd < 1 : il est moins lourd que le même volume d\'eau, il flotte.'],
+  ['Le quartz (7) et le verre (5,5) : qui raye qui ?', ['Le verre raye le quartz','Le quartz raye le verre','Ils ne se rayent pas','Les deux se rayent mutuellement'], 1, 'Le plus dur raye le plus tendre : 7 > 5,5.'],
+  ['Le verre résiste à la rayure mais se brise sous un choc. On dit qu\'il est…', ['tendre et solide','dur et fragile','souple et résistant','tendre et fragile'], 1, 'Dureté (rayure) et fragilité (casse au choc) sont deux propriétés différentes.'],
+  ['Un matériau a un module de Young très élevé. Il est…', ['très souple','très rigide','très léger','très isolant'], 1, 'E élevé : il se déforme peu sous une charge (acier, diamant).'],
+  ['Pourquoi met-on des barres d\'acier dans le béton ?', ['Pour l\'alléger','Parce que le béton résiste mal à la traction','Pour le rendre conducteur','Parce que le béton résiste mal à la compression'], 1, 'Le béton résiste bien à l\'écrasement mais mal à l\'étirement : l\'acier reprend la traction.'],
+  ['Quelle est l\'unité de la conductivité thermique λ ?', ['S/m','W/(m·K)','Ω·m','MPa'], 1, 'λ s\'exprime en watt par mètre-kelvin.'],
+  ['Lequel de ces matériaux est un isolant thermique ?', ['Cuivre','Aluminium','Polystyrène','Acier'], 2, 'Le polystyrène (λ ≈ 0,035) emprisonne de l\'air : il isole.'],
+  ['Quel est le symbole de la conductivité électrique ?', ['ρ','λ','σ','E'], 2, 'σ (sigma), en S/m. ρ est la résistivité, son inverse.'],
+  ['1 GPa est égal à…', ['10 MPa','100 MPa','1 000 MPa','0,001 MPa'], 2, 'Giga = 1 000 × Méga.'],
+  ['Le symbole ρ peut désigner deux grandeurs. Comment savoir laquelle ?', ['Grâce à l\'unité','Impossible','Grâce à la couleur','Grâce à la valeur'], 0, 'g/cm³ → masse volumique ; Ω·m → résistivité électrique.'],
+  ['Une mousse très absorbante (α ≈ 0,9) posée sur un mur…', ['isole parfaitement du bruit du voisin','réduit l\'écho dans la pièce','conduit le son','augmente R'], 1, 'Absorber (α) agit sur l\'écho dans la pièce. Isoler (R) demande une paroi lourde.']];
+let answered = 0, good = 0;
+function drawQuiz(){
+  answered = 0; good = 0; $('q-list').innerHTML = '';
+  Q.forEach((q, qi) => {
+    const box = document.createElement('div'); box.className = 'q';
+    box.innerHTML = `<p class="qt"><span>${String(qi + 1).padStart(2, '0')}</span>${q[0]}</p><div class="opts"></div><p class="expl" hidden></p>`;
+    const opts = box.querySelector('.opts');
+    q[1].forEach((o, oi) => {
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = o;
+      b.addEventListener('click', () => {
+        opts.querySelectorAll('button').forEach((x, k) => { x.disabled = true; if (k === q[2]) x.classList.add('ok'); });
+        if (oi !== q[2]) b.classList.add('ko'); else good++;
+        answered++;
+        const ex = box.querySelector('.expl'); ex.hidden = false; ex.textContent = (oi === q[2] ? '✓ Bravo. ' : '✗ Raté. ') + q[3];
+        score();
+      });
+      opts.appendChild(b);
+    });
+    $('q-list').appendChild(box);
+  });
+  score();
+}
+function score(){ $('q-score').textContent = `Score : ${good} / ${answered}` + (answered === Q.length ? ` · terminé (${Math.round(good / Q.length * 20)}/20)` : ` · ${Q.length - answered} question(s) restante(s)`); }
+$('q-reset').addEventListener('click', drawQuiz);
+drawQuiz();
+</script>
+
+</body></html>
